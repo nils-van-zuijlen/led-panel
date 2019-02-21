@@ -1,3 +1,6 @@
+#!/bin/env python3
+# Copyright (C) 2019 Nils VAN ZUIJLEN
+
 from datetime import datetime, timedelta
 import math
 import subprocess

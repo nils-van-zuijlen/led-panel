@@ -1,3 +1,6 @@
+#!/bin/env python3
+# Copyright (C) 2019 Nils VAN ZUIJLEN
+
 from rpi_ws281x import PixelStrip
 
 from ola.ClientWrapper import ClientWrapper as OLAClientWrapper
