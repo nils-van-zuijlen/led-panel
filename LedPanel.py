@@ -34,6 +34,8 @@ class LEDPanel:
         self._rows = 17
         self._columns = self._rows # We assume it's a square
 
+        self._old_universes = {}
+
         self.updateUniversesChannels()
 
         self._strip = PixelStrip(num=self._led_count, pin=12) # uses PWM0
@@ -123,7 +125,7 @@ class LEDPanel:
 
         self._last_universe = self.start_universe + self._universe_count - 1
 
-        self._old_universes = {}
+        self._old_universes.clear()
 
     def subscribeToUniverses(self):
         for uni in range(self.start_universe, self._last_universe + 1):
@@ -159,7 +161,7 @@ class LEDPanel:
         self.subscribeToUniverses()
 
 if __name__ == '__main__':
-    panel = LEDPanel(0,1)
+    panel = LEDPanel(universe=0, channel=1)
     try:
         panel.run()
     except KeyboardInterrupt:
