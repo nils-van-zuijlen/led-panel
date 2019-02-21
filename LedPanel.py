@@ -21,24 +21,30 @@ from rpi_ws281x import PixelStrip
 from ola.ClientWrapper import ClientWrapper as OLAClientWrapper
 from ola.DMXConstants import DMX_UNIVERSE_SIZE
 
+
 class ClientWrapper(OLAClientWrapper):
     def Execute(self, f):
         self._ss.Execute(f)
-        
+
 
 class LEDPanel:
-    """Listens to new data on the needed universes"""
+    """Listens to new data on the needed universes
+
+    start_universe: The universe in which the panel starts
+    start_channel: Inside the start_universe, the first channel used by the
+                    panel. Internally numbered starting from 0.
+    """
     def __init__(self, universe, channel):
         self.start_universe = universe
-        self.start_channel = channel - 1 # Channels will be numbered starting from 0 in this class
+        self.start_channel = channel - 1
         self._rows = 17
-        self._columns = self._rows # We assume it's a square
+        self._columns = self._rows  # We assume it's a square
 
         self._old_universes = {}
 
         self.updateUniversesChannels()
 
-        self._strip = PixelStrip(num=self._led_count, pin=12) # uses PWM0
+        self._strip = PixelStrip(num=self._led_count, pin=12)  # uses PWM0
         self._strip.begin()
 
         self._wrapper = ClientWrapper()
@@ -56,7 +62,8 @@ class LEDPanel:
             first_channel = 0
             last_channel = self._last_channel + 1
 
-            first_pixel_index = self._led_count - (self._rows_in_last_universe * self._columns)
+            first_pixel_index = self._led_count - (
+                self._rows_in_last_universe * self._columns)
         elif universe > self.start_universe and universe < self._last_universe:
             first_channel = 0
             last_channel = self._last_channel + 1
@@ -64,7 +71,8 @@ class LEDPanel:
             internal_universe_index = universe - self.start_universe
             pixels_in_first = self._rows_in_first_universe * self._columns
             pixels_in_full = self._rows_per_full_universe * self._columns
-            first_pixel_index = pixels_in_first + (internal_universe_index - 1) * pixels_in_full
+            first_pixel_index = pixels_in_first + (
+                (internal_universe_index - 1) * pixels_in_full)
         else:
             raise ValueError('universe must be one of the listened universes')
 
@@ -105,7 +113,8 @@ class LEDPanel:
 
         self._rows_per_full_universe = DMX_UNIVERSE_SIZE // self._channel_count_per_row
         channels_in_first_universe = DMX_UNIVERSE_SIZE - self.start_channel
-        self._rows_in_first_universe = channels_in_first_universe // self._channel_count_per_row
+        self._rows_in_first_universe = channels_in_first_universe \
+            // self._channel_count_per_row
 
         self._last_channel_used_in_first_universe = self.start_channel + \
             self._rows_in_first_universe * self._channel_count_per_row - 1
@@ -129,11 +138,13 @@ class LEDPanel:
 
     def subscribeToUniverses(self):
         for uni in range(self.start_universe, self._last_universe + 1):
-            self._client.RegisterUniverse(uni, self._client.REGISTER, self.getCallbackForUniverse(uni))
+            self._client.RegisterUniverse(uni, self._client.REGISTER,
+                                          self.getCallbackForUniverse(uni))
 
     def unsubscribeFromUniverses(self):
         for uni in range(self.start_universe, self._last_universe + 1):
-            self._client.RegisterUniverse(uni, self._client.UNREGISTER, data_callback=None)
+            self._client.RegisterUniverse(uni, self._client.UNREGISTER,
+                                          data_callback=None)
 
     def run(self):
         print("Launched LEDPanel")
@@ -159,6 +170,7 @@ class LEDPanel:
 
         self.updateUniversesChannels()
         self.subscribeToUniverses()
+
 
 if __name__ == '__main__':
     panel = LEDPanel(universe=0, channel=1)

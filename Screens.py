@@ -30,14 +30,17 @@ DOWN_BUTTON = 6
 OK_BUTTON = 19
 BACK_BUTTON = 13
 
+
 class fakepanel:
     def __init__(self):
         self.threadSafeSchedule = lambda a, b: None
         self.start_universe = 0
         self.start_channel = 1
         self.setOnOff = lambda a: None
+
     def setAddress(self, universe=None, channel=None):
         pass
+
     def run(self):
         input()
 
@@ -45,8 +48,10 @@ class fakepanel:
 def get_ip_address():
     return subprocess.check_output(["hostname", "-i"]).decode().split(' ')[0]
 
+
 class ParentalError(ValueError):
     pass
+
 
 class Screen:
     def __init__(self, scr_id, showname, manager):
@@ -61,7 +66,7 @@ class Screen:
         self.callback = lambda a: None
 
     def addChild(self, child):
-        if not child in self.children:
+        if child not in self.children:
             self.children.append(child)
         child.setParent(self)
         if self.selectedChild is None:
@@ -90,19 +95,24 @@ class Screen:
         try:
             self.manager.current = self.children[self.selectedChild]
         except IndexError:
-            print("E: gotoSelectedChild called on screen " + self.scr_id + " with selectedChild not being in correct range")
+            print("E: gotoSelectedChild called on screen {} with selectedChild not being "
+                  "in correct range".format(self.scr_id))
         except TypeError:
-            print("E: gotoSelectedChild called on screen " + self.scr_id + " with selectedChild being None")
+            print("E: gotoSelectedChild called on screen {} with selectedChild being None"
+                  .format(self.scr_id))
+
     def gotoParent(self):
         if self.parent is not None:
             self.manager.current = self.parent
         else:
-            print("E: gotoParent called on screen " + self.scr_id + " with parent being None")
+            print("E: gotoParent called on screen {} with parent being None"
+                  .format(self.scr_id))
 
     def incrementSelectedChild(self):
         self.selectedChild += 1
         if self.selectedChild > len(self.children) - 1:
             self.selectedChild = 0
+
     def decrementSelectedChild(self):
         self.selectedChild -= 1
         if self.selectedChild < 0:
@@ -117,17 +127,22 @@ class Screen:
 
     def onOK(self):
         pass
+
     def onBack(self):
         pass
+
     def onUp(self):
         pass
+
     def onDown(self):
         pass
+
 
 class StartScreen(Screen):
     """A Start screen
 
-    It can not be a child of any other screen, raises ParentalError if you try to do it anyway
+    It can not be a child of any other screen,
+    raises ParentalError if you try to do it anyway
     """
     def __init__(self, scr_id, showname, manager, text):
         super(StartScreen, self).__init__(scr_id, showname, manager)
@@ -143,34 +158,41 @@ class StartScreen(Screen):
         super(StartScreen, self).computeDisplay()
         self.second_line = self.text[:20]
 
+
 class EndScreen(Screen):
     """An End screen
 
-    It can not have childrens, if you try to assign some anyway, it will rise a ParentalError
+    It can not have childrens, if you try to assign some anyway,
+    it will raise a ParentalError
     """
     def addChild(self, child):
         raise ParentalError('EndScreen cannot have any children')
-    
+
     def onOK(self):
         self.gotoParent()
+
     def onBack(self):
         self.gotoParent()
+
 
 class MenuScreen(Screen):
     """A Menu Screen"""
     def onOK(self):
         self.gotoSelectedChild()
+
     def onBack(self):
         self.gotoParent()
 
     def onUp(self):
         self.incrementSelectedChild()
+
     def onDown(self):
         self.decrementSelectedChild()
 
     def computeDisplay(self):
         super(MenuScreen, self).computeDisplay()
         self.second_line = '\x00' + self.children[self.selectedChild].showname[:19]
+
 
 class ValueScreen(EndScreen):
     """Enables the user to set a value
@@ -180,7 +202,7 @@ class ValueScreen(EndScreen):
     """
     def __init__(self, scr_id, showname, manager, initial, minimum, maximum):
         super(ValueScreen, self).__init__(scr_id, showname, manager)
-        
+
         self.value = initial
         self.old_value = initial
         self.minimum = minimum
@@ -201,6 +223,7 @@ class ValueScreen(EndScreen):
                 self.value = self.minimum
         else:
             self.value += 1
+
     def onDown(self):
         if self.value == self.minimum:
             if math.isfinite(self.maximum):
@@ -211,6 +234,7 @@ class ValueScreen(EndScreen):
     def computeDisplay(self):
         super(ValueScreen, self).computeDisplay()
         self.second_line = '\x00' + str(self.value)[:19]
+
 
 class ToggleScreen(EndScreen):
     """A Toggle button screen"""
@@ -229,6 +253,7 @@ class ToggleScreen(EndScreen):
         self.state = True
         if last != self.state:
             self.callback(self.state)
+
     def onDown(self):
         last = self.state
         self.state = False
@@ -242,6 +267,7 @@ class ToggleScreen(EndScreen):
         else:
             self.second_line = '\x00Eteint'
 
+
 class InformationScreen(EndScreen):
     """Shows a value"""
     def __init__(self, scr_id, showname, manager, value):
@@ -252,9 +278,10 @@ class InformationScreen(EndScreen):
         super(InformationScreen, self).computeDisplay()
         self.second_line = self.value[:20]
 
+
 class ScreenManager:
     """Manages Screens
-    
+
     Creates the arborescence needed for a LedPanel and manages it
 
     Please call GPIO.cleanup() once you have finished.
@@ -263,24 +290,19 @@ class ScreenManager:
         self.panel = panel
 
         home = StartScreen('HOME', 'LedPanel 289', self,
-            'Made by N.V.Zuijlen')
+                           'Made by N.V.Zuijlen')
         main_menu = MenuScreen('MAIN_MENU', 'Menu', self)
         manual_menu = MenuScreen('MANUAL_MENU', 'Manuel', self)
-        universe_selector = ValueScreen('UNIVERSE_SELECTOR', 'Choix Univers',
-            self, self.panel.start_universe, 0, math.inf)
-        channel_selector = ValueScreen('CHANNEL_SELECTOR', 'Choix Adresse',
-            self, self.panel.start_channel, 1, DMX_UNIVERSE_SIZE)
+        universe_selector = ValueScreen('UNIVERSE_SELECTOR', 'Choix Univers', self,
+                                        self.panel.start_universe, 0, math.inf)
+        channel_selector = ValueScreen('CHANNEL_SELECTOR', 'Choix Adresse', self,
+                                       self.panel.start_channel, 1, DMX_UNIVERSE_SIZE)
         blackout = ToggleScreen('BLACKOUT', 'Blackout', self)
         test_pattern = ToggleScreen('TEST_PATTERN', 'Test leds', self)
-        ip_info = InformationScreen('IP_INFO', 'Adresse IP', self,
-            get_ip_address())
+        ip_info = InformationScreen('IP_INFO', 'Adresse IP', self, get_ip_address())
 
-        universe_selector.setCallback(
-            lambda uni: self.panel.setAddress(universe=uni)
-            )
-        channel_selector.setCallback(
-            lambda chan: self.panel.setAddress(channel=chan)
-            )
+        universe_selector.setCallback(lambda uni: self.panel.setAddress(universe=uni))
+        channel_selector.setCallback(lambda chan: self.panel.setAddress(channel=chan))
         blackout.setCallback(lambda off: self.panel.setOnOff(not off))
 
         home.addChild(main_menu)
@@ -356,9 +378,10 @@ class ScreenManager:
         self.lcd.printline(0, self.current.first_line + "                    ")
         self.lcd.printline(1, self.current.second_line + "                    ")
 
+
 if __name__ == '__main__':
     from LedPanel import LEDPanel
-    
+
     GPIO.setmode(GPIO.BCM)
 
     #panel = fakepanel()
