@@ -1,0 +1,4 @@
+RPi.GPIO
+rpi_ws281x
+adafruit-blinka
+adafruit-circuitpython-charlcd
