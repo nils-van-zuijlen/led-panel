@@ -43,7 +43,7 @@ class fakepanel:
 
 
 def get_ip_address():
-    return str(subprocess.check_output(["hostname", "-i"])).split('\n')[0]
+    return subprocess.check_output(["hostname", "-i"]).decode().split(' ')[0]
 
 class ParentalError(ValueError):
     pass
