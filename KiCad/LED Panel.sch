@@ -1,0 +1,127 @@
+EESchema Schematic File Version 4
+EELAYER 26 0
+EELAYER END
+$Descr A4 11693 8268
+encoding utf-8
+Sheet 1 1
+Title ""
+Date ""
+Rev ""
+Comp ""
+Comment1 ""
+Comment2 ""
+Comment3 ""
+Comment4 ""
+$EndDescr
+$Comp
+L Connector:Conn_01x05_Male J1
+U 1 1 5C6FD936
+P 4250 2500
+F 0 "J1" H 4356 2878 50  0000 C CNN
+F 1 "Conn_01x05_Male" H 4356 2787 50  0000 C CNN
+F 2 "Connector_JST:JST_ACH_BBM05B-ACHSS-A-GAN-ETF_1x05-1MP_P1.20mm_Vertical" H 4250 2500 50  0001 C CNN
+F 3 "~" H 4250 2500 50  0001 C CNN
+	1    4250 2500
+	1    0    0    -1  
+$EndComp
+$Comp
+L Switch:SW_Push SW1
+U 1 1 5C6FDF08
+P 5350 2200
+F 0 "SW1" H 5350 2485 50  0000 C CNN
+F 1 "SW_Push" H 5350 2394 50  0000 C CNN
+F 2 "Button_Switch_THT:SW_PUSH-12mm_Wuerth-430476085716" H 5350 2400 50  0001 C CNN
+F 3 "" H 5350 2400 50  0001 C CNN
+	1    5350 2200
+	1    0    0    -1  
+$EndComp
+$Comp
+L Switch:SW_Push SW3
+U 1 1 5C6FDF90
+P 5350 2750
+F 0 "SW3" H 5350 3035 50  0000 C CNN
+F 1 "SW_Push" H 5350 2944 50  0000 C CNN
+F 2 "Button_Switch_THT:SW_PUSH-12mm_Wuerth-430476085716" H 5350 2950 50  0001 C CNN
+F 3 "" H 5350 2950 50  0001 C CNN
+	1    5350 2750
+	1    0    0    -1  
+$EndComp
+$Comp
+L Switch:SW_Push SW2
+U 1 1 5C6FE02D
+P 6150 2200
+F 0 "SW2" H 6150 2485 50  0000 C CNN
+F 1 "SW_Push" H 6150 2394 50  0000 C CNN
+F 2 "Button_Switch_THT:SW_PUSH-12mm_Wuerth-430476085716" H 6150 2400 50  0001 C CNN
+F 3 "" H 6150 2400 50  0001 C CNN
+	1    6150 2200
+	1    0    0    -1  
+$EndComp
+$Comp
+L Switch:SW_Push SW4
+U 1 1 5C6FE095
+P 6150 2750
+F 0 "SW4" H 6150 3035 50  0000 C CNN
+F 1 "SW_Push" H 6150 2944 50  0000 C CNN
+F 2 "Button_Switch_THT:SW_PUSH-12mm_Wuerth-430476085716" H 6150 2950 50  0001 C CNN
+F 3 "" H 6150 2950 50  0001 C CNN
+	1    6150 2750
+	1    0    0    -1  
+$EndComp
+Wire Wire Line
+	5550 2200 5750 2200
+Connection ~ 5750 2200
+Wire Wire Line
+	5750 2200 5950 2200
+Wire Wire Line
+	5550 2750 5750 2750
+Connection ~ 5750 2750
+Wire Wire Line
+	5750 2750 5950 2750
+Wire Wire Line
+	4450 2400 5150 2400
+Wire Wire Line
+	5150 2400 5150 2200
+Wire Wire Line
+	4450 2500 5200 2500
+Wire Wire Line
+	4450 2600 5150 2600
+Wire Wire Line
+	5150 2600 5150 2750
+Wire Wire Line
+	4450 2850 6350 2850
+Wire Wire Line
+	6350 2750 6350 2850
+Wire Wire Line
+	4450 2850 4450 2700
+Wire Wire Line
+	5750 2200 5750 2750
+Wire Wire Line
+	5750 2200 5750 1750
+Wire Wire Line
+	5750 1750 5050 1750
+Wire Wire Line
+	4700 1750 4700 2300
+Wire Wire Line
+	4700 2300 4450 2300
+Wire Wire Line
+	5200 2500 5200 2350
+Wire Wire Line
+	5200 2350 6350 2350
+Wire Wire Line
+	6350 2200 6350 2350
+$Comp
+L power:GND #PWR0101
+U 1 1 5C6FECAE
+P 5050 1750
+F 0 "#PWR0101" H 5050 1500 50  0001 C CNN
+F 1 "GND" H 5055 1577 50  0000 C CNN
+F 2 "" H 5050 1750 50  0001 C CNN
+F 3 "" H 5050 1750 50  0001 C CNN
+	1    5050 1750
+	1    0    0    -1  
+$EndComp
+Connection ~ 5050 1750
+Wire Wire Line
+	5050 1750 4700 1750
+$EndSCHEMATC
