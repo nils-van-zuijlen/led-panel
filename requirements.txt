@@ -1,4 +1,3 @@
 RPi.GPIO
 rpi_ws281x
-adafruit-blinka
-adafruit-circuitpython-charlcd
+https://github.com/pl31/python-liquidcrystal_i2c/archive/master.zip
