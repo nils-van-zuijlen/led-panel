@@ -325,7 +325,7 @@ class MacroScreen(EndScreen):
             if self.repeat:
                 frame = next(self.macro)
             else:
-                return
+                self._stop()
 
         # send the frame to the panel
         self.panel.showFrame(frame)
@@ -339,6 +339,7 @@ class MacroScreen(EndScreen):
         self.running = False
         self.macro.reset()
         self.panel.subscribeToUniverses()
+        self.manager.updateScreen()
 
     onDown = _stop
 
