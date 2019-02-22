@@ -21,6 +21,7 @@ from rpi_ws281x import PixelStrip
 from ola.ClientWrapper import ClientWrapper as OLAClientWrapper
 from ola.DMXConstants import DMX_UNIVERSE_SIZE
 from RPi import GPIO
+import threading
 
 STATUS_LED = 17
 
@@ -37,10 +38,11 @@ class LEDPanel:
     start_channel: Inside the start_universe, the first channel used by the
                     panel. Internally numbered starting from 0.
     """
-    def __init__(self, universe, channel):
+    def __init__(self, universe, channel, size=17):
+        self.address_lock = threading.Lock()
         self.start_universe = universe
         self.start_channel = channel - 1
-        self._rows = 17
+        self._rows = size
         self._columns = self._rows  # We assume it's a square
 
         self._old_universes = {}
@@ -167,16 +169,21 @@ class LEDPanel:
         self._wrapper.Execute(f)
 
     def setAddress(self, universe=None, channel=None):
-        universe = universe if universe is not None else self.start_universe
-        channel = channel - 1 if channel is not None else self.start_channel
+        """Sets the panel's address
 
-        self.unsubscribeFromUniverses()
+        This method is threadsafe
+        """
+        with self.address_lock:
+            universe = universe if universe is not None else self.start_universe
+            channel = channel - 1 if channel is not None else self.start_channel
 
-        self.start_universe = universe
-        self.start_channel = channel
+            self.unsubscribeFromUniverses()
 
-        self.updateUniversesChannels()
-        self.subscribeToUniverses()
+            self.start_universe = universe
+            self.start_channel = channel
+
+            self.updateUniversesChannels()
+            self.subscribeToUniverses()
 
 
 if __name__ == '__main__':
