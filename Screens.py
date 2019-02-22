@@ -344,7 +344,7 @@ class ScreenManager:
             GPIO.add_event_detect(
                 pin, GPIO.RISING,
                 callback=self.getGPIOCallback(),
-                bouncetime=100
+                bouncetime=200
                 )
 
     def getGPIOCallback(self):
