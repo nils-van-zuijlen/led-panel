@@ -349,6 +349,7 @@ class ScreenManager:
 
     def getGPIOCallback(self):
         def GPIOCallback(channel):
+            GPIO.output(STATUS_LED, GPIO.HIGH)
             #self.backlightOn()
 
             if channel == UP_BUTTON:
@@ -364,6 +365,8 @@ class ScreenManager:
                 print("BACK", channel)
                 self.current.onBack()
             self.updateScreen()
+
+            GPIO.output(STATUS_LED, GPIO.LOW)
         return GPIOCallback
 
     def backlightOn(self):
