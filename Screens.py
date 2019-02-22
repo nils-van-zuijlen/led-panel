@@ -24,11 +24,12 @@ from ola.DMXConstants import DMX_UNIVERSE_SIZE
 from RPi import GPIO
 from RPLCD.i2c import CharLCD
 
+from LedPanel import STATUS_LED
+
 UP_BUTTON = 26
 DOWN_BUTTON = 6
 OK_BUTTON = 19
 BACK_BUTTON = 13
-STATUS_LED = 17
 
 
 class fakepanel:
@@ -405,8 +406,10 @@ if __name__ == '__main__':
 
         manager.listenToGPIO()
         manager.updateScreen()
+
         GPIO.setup(STATUS_LED, GPIO.OUT)
-        GPIO.output(STATUS_LED, GPIO.HIGH)
+        GPIO.output(STATUS_LED, GPIO.LOW)
+
         panel.run()
     finally:
         GPIO.output(STATUS_LED, GPIO.LOW)

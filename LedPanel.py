@@ -20,6 +20,9 @@ from rpi_ws281x import PixelStrip
 
 from ola.ClientWrapper import ClientWrapper as OLAClientWrapper
 from ola.DMXConstants import DMX_UNIVERSE_SIZE
+from RPi import GPIO
+
+STATUS_LED = 17
 
 
 class ClientWrapper(OLAClientWrapper):
@@ -85,6 +88,8 @@ class LEDPanel:
             if universe not in old_universes or data != old_universes[universe]:
                 old_universes[universe] = data
 
+                GPIO.output(STATUS_LED, GPIO.HIGH)
+
                 for i in range(0, last_channel - first_channel, 3):
                     try:
                         r = data[i]
@@ -104,6 +109,8 @@ class LEDPanel:
                     strip.setPixelColorRGB(int(i/3)+first_pixel_index, r, g, b)
                 strip.show()
                 print(universe)
+
+                GPIO.output(STATUS_LED, GPIO.LOW)
 
         return callback
 
@@ -175,6 +182,13 @@ class LEDPanel:
 if __name__ == '__main__':
     panel = LEDPanel(universe=0, channel=1)
     try:
+
+        GPIO.setmode(GPIO.BCM)
+
+        GPIO.setup(STATUS_LED, GPIO.OUT)
+        GPIO.output(STATUS_LED, GPIO.LOW)
+
         panel.run()
     finally:
         panel.setOnOff(False)
+        GPIO.cleanup()
