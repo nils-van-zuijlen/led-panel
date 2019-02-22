@@ -151,9 +151,8 @@ class LEDPanel:
 
         self._last_universe = self.start_universe + self._universe_count - 1
 
-        self._old_universes.clear()
-
     def subscribeToUniverses(self):
+        self._old_universes.clear()
         for uni in range(self.start_universe, self._last_universe + 1):
             self._client.RegisterUniverse(uni, self._client.REGISTER,
                                           self.getCallbackForUniverse(uni))
