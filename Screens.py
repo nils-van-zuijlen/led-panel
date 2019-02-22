@@ -328,7 +328,7 @@ class MacroScreen(EndScreen):
                 return
 
         # send the frame to the panel
-        frame
+        self.panel.showFrame(frame)
 
         self.panel.threadSafeSchedule(
             self.macro.step_length,
