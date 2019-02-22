@@ -98,9 +98,9 @@ class TestPixels(Macro):
         else:
             panel = self.empty_table_panel
 
-            row = i % self.rows
-            col = (i // self.rows) % self.cols
-            color = ((i // self.rows) // self.cols) % self.cols
+            color = i % 3
+            col = (i // 3) % self.cols
+            row = ((i // 3) // self.cols) % self.rows
 
             panel[row][col][color] = 255
 
