@@ -161,7 +161,7 @@ class LEDPanel:
 
     def setAddress(self, universe=None, channel=None):
         universe = universe if universe is not None else self.start_universe
-        channel = channel if channel is not None else self.start_channel
+        channel = channel - 1 if channel is not None else self.start_channel
 
         self.unsubscribeFromUniverses()
 

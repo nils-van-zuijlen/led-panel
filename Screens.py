@@ -295,7 +295,7 @@ class ScreenManager:
         universe_selector = ValueScreen('UNIVERSE_SELECTOR', 'Choix Univers', self,
                                         self.panel.start_universe, 0, math.inf)
         channel_selector = ValueScreen('CHANNEL_SELECTOR', 'Choix Adresse', self,
-                                       self.panel.start_channel, 1, DMX_UNIVERSE_SIZE)
+                                       self.panel.start_channel+1, 1, DMX_UNIVERSE_SIZE)
         blackout = ToggleScreen('BLACKOUT', 'Blackout', self)
         test_pattern = ToggleScreen('TEST_PATTERN', 'Test leds', self)
         ip_info = InformationScreen('IP_INFO', 'Adresse IP', self, get_ip_address())
