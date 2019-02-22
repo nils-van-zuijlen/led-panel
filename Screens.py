@@ -28,6 +28,7 @@ UP_BUTTON = 26
 DOWN_BUTTON = 6
 OK_BUTTON = 19
 BACK_BUTTON = 13
+STATUS_LED = 17
 
 
 class fakepanel:
@@ -404,7 +405,10 @@ if __name__ == '__main__':
 
         manager.listenToGPIO()
         manager.updateScreen()
+        GPIO.setup(STATUS_LED, GPIO.OUT)
+        GPIO.output(STATUS_LED, GPIO.HIGH)
         panel.run()
     finally:
+        GPIO.output(STATUS_LED, GPIO.LOW)
         manager.cleanup()
         panel.setOnOff(False)
