@@ -116,5 +116,8 @@ class TestPixels(Macro):
     def step_length(self):
         """Length of a step in ms"""
         if self.index == 0:
+            return 1
+        elif self.index == 1:
             return 10*1000
-        return 250
+        else:
+            return 250
