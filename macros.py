@@ -115,4 +115,6 @@ class TestPixels(Macro):
     @property
     def step_length(self):
         """Length of a step in ms"""
-        return 500
+        if self.index == 0:
+            return 10*1000
+        return 250
