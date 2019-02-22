@@ -154,7 +154,7 @@ class StartScreen(Screen):
     def setParent(self):
         raise ParentalError("Assigning a Start screen as child of someone")
 
-    onOK = gotoSelectedChild
+    onOK = Screen.gotoSelectedChild
 
     def computeDisplay(self):
         super(StartScreen, self).computeDisplay()
@@ -170,20 +170,20 @@ class EndScreen(Screen):
     def addChild(self, child):
         raise ParentalError('EndScreen cannot have any children')
 
-    onOK = gotoParent
+    onOK = Screen.gotoParent
 
-    onBack = gotoParent
+    onBack = Screen.gotoParent
 
 
 class MenuScreen(Screen):
     """A Menu Screen"""
-    onOK = gotoSelectedChild
+    onOK = Screen.gotoSelectedChild
 
-    onBack = gotoParent
+    onBack = Screen.gotoParent
 
-    onUp = incrementSelectedChild
+    onUp = Screen.incrementSelectedChild
 
-    onDown = decrementSelectedChild
+    onDown = Screen.decrementSelectedChild
 
     def computeDisplay(self):
         super(MenuScreen, self).computeDisplay()
