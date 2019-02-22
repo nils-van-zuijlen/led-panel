@@ -22,8 +22,7 @@ import subprocess
 
 from ola.DMXConstants import DMX_UNIVERSE_SIZE
 from RPi import GPIO
-
-import liquidcrystal_i2c
+from RPLCD.i2c import CharLCD
 
 UP_BUTTON = 26
 DOWN_BUTTON = 6
@@ -284,7 +283,7 @@ class ScreenManager:
 
     Creates the arborescence needed for a LedPanel and manages it
 
-    Please call GPIO.cleanup() once you have finished.
+    Please call cleanup() once you have finished.
     """
     def __init__(self, panel):
         self.panel = panel
@@ -317,10 +316,13 @@ class ScreenManager:
 
         self.current = home
 
-        self.lcd = liquidcrystal_i2c.LiquidCrystal_I2C(0x3F, 1, numlines=4)
+        self.lcd = CharLCD(i2c_expander='PCF8574', address=0x3F, cols=20, rows=4,
+                           auto_linebreaks=False, backlight_enabled=False)
+
+        self.lcd.cursor_mode = 'hide'
 
         # UP/DOWN arrow. Use as char \x00
-        self.lcd.createChar(0, [
+        self.lcd.create_char(0, (
             0b00100,
             0b01110,
             0b11111,
@@ -329,9 +331,10 @@ class ScreenManager:
             0b11111,
             0b01110,
             0b00100
-            ])
+            ))
 
         self.updateScreen()
+        self.backlightOn()
 
     def listenToGPIO(self):
         for pin in [UP_BUTTON, DOWN_BUTTON, OK_BUTTON, BACK_BUTTON]:
@@ -363,7 +366,7 @@ class ScreenManager:
 
     def backlightOn(self):
         self.on_time = datetime.now()
-        self.lcd.backlight()
+        self.lcd.backlight_enabled = True
         self.panel.threadSafeSchedule(
             11*1000,
             self.turn_off_backlight_if_inactivity
@@ -371,12 +374,19 @@ class ScreenManager:
 
     def turn_off_backlight_if_inactivity(self):
         if datetime.now() - self.on_time >= timedelta(seconds=10):
-            self.lcd.noBacklight()
+            self.lcd.backlight_enabled = False
 
     def updateScreen(self):
         self.current.computeDisplay()
-        self.lcd.printline(0, self.current.first_line + "                    ")
-        self.lcd.printline(1, self.current.second_line + "                    ")
+
+        self.lcd.clear()
+        self.lcd.write_string(self.current.first_line)
+        self.lcd.crlf()
+        self.lcd.write_string(self.current.second_line)
+
+    def cleanup(self):
+        GPIO.cleanup()
+        self.lcd.close(clear=True)
 
 
 if __name__ == '__main__':
@@ -384,13 +394,13 @@ if __name__ == '__main__':
 
     GPIO.setmode(GPIO.BCM)
 
-    #panel = fakepanel()
+    # panel = fakepanel()  # use this if you do not want the real panel to fire up.
     panel = LEDPanel(universe=0, channel=1)
     manager = ScreenManager(panel)
 
     try:
         #manager.backlightOn()
-        manager.lcd.backlight()
+        manager.lcd.backlight_enabled = True
 
         manager.listenToGPIO()
         manager.updateScreen()
