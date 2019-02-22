@@ -292,6 +292,7 @@ class ScreenManager:
         self.panel = panel
 
         self.lcd_lock = threading.RLock()
+        self.gpio_lock = threading.Lock()
 
         home = StartScreen('HOME', 'LedPanel 289', self,
                            'Made by N.V.Zuijlen')
@@ -353,24 +354,25 @@ class ScreenManager:
 
     def getGPIOCallback(self):
         def GPIOCallback(channel):
-            GPIO.output(STATUS_LED, GPIO.HIGH)
-            #self.backlightOn()
+            with self.gpio_lock:
+                GPIO.output(STATUS_LED, GPIO.HIGH)
+                #self.backlightOn()
 
-            if channel == UP_BUTTON:
-                print("UP", channel)
-                self.current.onUp()
-            elif channel == DOWN_BUTTON:
-                print("DOWN", channel)
-                self.current.onDown()
-            elif channel == OK_BUTTON:
-                print("OK", channel)
-                self.current.onOK()
-            elif channel == BACK_BUTTON:
-                print("BACK", channel)
-                self.current.onBack()
-            self.updateScreen()
+                if channel == UP_BUTTON:
+                    print("UP", channel)
+                    self.current.onUp()
+                elif channel == DOWN_BUTTON:
+                    print("DOWN", channel)
+                    self.current.onDown()
+                elif channel == OK_BUTTON:
+                    print("OK", channel)
+                    self.current.onOK()
+                elif channel == BACK_BUTTON:
+                    print("BACK", channel)
+                    self.current.onBack()
+                self.updateScreen()
 
-            GPIO.output(STATUS_LED, GPIO.LOW)
+                GPIO.output(STATUS_LED, GPIO.LOW)
         return GPIOCallback
 
     def backlightOn(self):
