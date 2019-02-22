@@ -337,6 +337,7 @@ class MacroScreen(EndScreen):
 
     def _stop(self):
         self.running = False
+        self.macro.reset()
         self.panel.subscribeToUniverses()
 
     onDown = _stop

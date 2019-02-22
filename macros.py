@@ -78,6 +78,9 @@ class Macro:
 
         return val
 
+    def reset(self):
+        self.index = 0
+
 
 class TestPixels(Macro):
     """An example macro"""
