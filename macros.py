@@ -14,7 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-from dataclasses import dataclass
+from dataclasses import dataclass, astuple
 
 
 @dataclass()
@@ -61,7 +61,7 @@ class Macro:
         else:
             for row in panel:
                 for pixel in row:
-                    p.append(pixel.astuple())
+                    p.append(astuple(pixel))
         return p
 
     def __iter__(self):
