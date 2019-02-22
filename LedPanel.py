@@ -176,5 +176,5 @@ if __name__ == '__main__':
     panel = LEDPanel(universe=0, channel=1)
     try:
         panel.run()
-    except KeyboardInterrupt:
+    finally:
         panel.setOnOff(False)

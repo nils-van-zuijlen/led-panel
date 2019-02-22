@@ -334,7 +334,7 @@ class ScreenManager:
             ))
 
         self.updateScreen()
-        self.backlightOn()
+        #self.backlightOn()
 
     def listenToGPIO(self):
         for pin in [UP_BUTTON, DOWN_BUTTON, OK_BUTTON, BACK_BUTTON]:
@@ -406,7 +406,5 @@ if __name__ == '__main__':
         manager.updateScreen()
         panel.run()
     finally:
-        manager.lcd.clear()
-        manager.lcd.noBacklight()
+        manager.cleanup()
         panel.setOnOff(False)
-        GPIO.cleanup()
