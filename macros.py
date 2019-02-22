@@ -94,7 +94,7 @@ class TestPixels(Macro):
                 for pixel in row:
                     pixel.white = 255
 
-            return self.decode(panel)
+            return panel
         else:
             panel = self.empty_table_panel
 
