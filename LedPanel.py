@@ -57,6 +57,14 @@ class LEDPanel:
 
         self.subscribeToUniverses()
 
+    @property
+    def columns(self):
+        return self._columns
+
+    @property
+    def rows(self):
+        return self._rows
+
     def getCallbackForUniverse(self, universe):
         if universe == self.start_universe:
             first_channel = self.start_channel

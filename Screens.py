@@ -364,7 +364,8 @@ class ScreenManager:
         channel_selector = ValueScreen('CHANNEL_SELECTOR', 'Choix Adresse', self,
                                        self.panel.start_channel+1, 1, DMX_UNIVERSE_SIZE)
         blackout = ToggleScreen('BLACKOUT', 'Blackout', self)
-        test_pattern = MacroScreen('TEST_PATTERN', 'Test leds', self, macros.TestPixels())
+        test_pattern = MacroScreen('TEST_PATTERN', 'Test leds', self,
+                                   macros.TestPixels(panel.columns, panel.rows))
         ip_info = InformationScreen('IP_INFO', 'Adresse IP', self, get_ip_address())
 
         universe_selector.setCallback(lambda uni: self.panel.setAddress(universe=uni))
