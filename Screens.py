@@ -26,6 +26,7 @@ from RPi import GPIO
 from RPLCD.i2c import CharLCD
 
 from LedPanel import STATUS_LED
+import macros
 
 UP_BUTTON = 26
 DOWN_BUTTON = 6
@@ -153,8 +154,7 @@ class StartScreen(Screen):
     def setParent(self):
         raise ParentalError("Assigning a Start screen as child of someone")
 
-    def onOK(self):
-        self.gotoSelectedChild()
+    onOK = gotoSelectedChild
 
     def computeDisplay(self):
         super(StartScreen, self).computeDisplay()
@@ -170,26 +170,20 @@ class EndScreen(Screen):
     def addChild(self, child):
         raise ParentalError('EndScreen cannot have any children')
 
-    def onOK(self):
-        self.gotoParent()
+    onOK = gotoParent
 
-    def onBack(self):
-        self.gotoParent()
+    onBack = gotoParent
 
 
 class MenuScreen(Screen):
     """A Menu Screen"""
-    def onOK(self):
-        self.gotoSelectedChild()
+    onOK = gotoSelectedChild
 
-    def onBack(self):
-        self.gotoParent()
+    onBack = gotoParent
 
-    def onUp(self):
-        self.incrementSelectedChild()
+    onUp = incrementSelectedChild
 
-    def onDown(self):
-        self.decrementSelectedChild()
+    onDown = decrementSelectedChild
 
     def computeDisplay(self):
         super(MenuScreen, self).computeDisplay()
@@ -281,6 +275,73 @@ class InformationScreen(EndScreen):
         self.second_line = self.value[:20]
 
 
+class MacroScreen(EndScreen):
+    """Screen used to run macros"""
+    def __init__(self, scr_id, showname, manager, macro, repeat=True):
+        super(MacroScreen, self).__init__(scr_id, showname, manager)
+        self.macro = macro
+        self.running = False
+        self.repeat = repeat
+        self.panel = self.manager.panel
+
+    def onOK(self):
+        if self.running:
+            self._stop()
+        else:
+            self._run()
+
+    def onBack(self):
+        self._stop()
+        super(self.__class__, self).onBack()
+
+    def onUp(self):
+        if not self.running:
+            self._run()
+
+    def computeDisplay(self):
+        super(self.__class__, self).computeDisplay()
+        if self.running:
+            self.second_line = "En cours"
+        else:
+            self.second_line = "A l'arret"
+
+    def _run(self):
+        self.running = True
+
+        self.panel.unsubscribeFromUniverses()
+
+        self.panel.threadSafeSchedule(
+            self.macro.step_length,
+            self._run_callback
+            )
+
+    def _run_callback(self):
+        if not self.running:
+            return
+
+        try:
+            frame = next(self.macro)
+        except StopIteration:
+            if self.repeat:
+                frame = next(self.macro)
+            else:
+                return
+
+        # send the frame to the panel
+        frame
+
+        self.panel.threadSafeSchedule(
+            self.macro.step_length,
+            self._run_callback
+            )
+
+    def _stop(self):
+        self.running = False
+        self.panel.subscribeToUniverses()
+
+    onDown = _stop
+
+
 class ScreenManager:
     """Manages Screens
 
@@ -303,7 +364,7 @@ class ScreenManager:
         channel_selector = ValueScreen('CHANNEL_SELECTOR', 'Choix Adresse', self,
                                        self.panel.start_channel+1, 1, DMX_UNIVERSE_SIZE)
         blackout = ToggleScreen('BLACKOUT', 'Blackout', self)
-        test_pattern = ToggleScreen('TEST_PATTERN', 'Test leds', self)
+        test_pattern = MacroScreen('TEST_PATTERN', 'Test leds', self, macros.TestPixels())
         ip_info = InformationScreen('IP_INFO', 'Adresse IP', self, get_ip_address())
 
         universe_selector.setCallback(lambda uni: self.panel.setAddress(universe=uni))

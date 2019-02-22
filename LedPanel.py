@@ -185,6 +185,11 @@ class LEDPanel:
             self.updateUniversesChannels()
             self.subscribeToUniverses()
 
+    def showFrame(self, frame):
+        for i, pixel in enumerate(frame):
+            self._strip.setPixelColorRGB(i, *pixel)
+        self._strip.show()
+
 
 if __name__ == '__main__':
     panel = LEDPanel(universe=0, channel=1)
