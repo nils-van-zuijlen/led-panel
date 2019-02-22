@@ -18,6 +18,7 @@
 
 from datetime import datetime, timedelta
 import math
+import threading
 import subprocess
 
 from ola.DMXConstants import DMX_UNIVERSE_SIZE
@@ -290,6 +291,8 @@ class ScreenManager:
     def __init__(self, panel):
         self.panel = panel
 
+        self.lcd_lock = threading.RLock()
+
         home = StartScreen('HOME', 'LedPanel 289', self,
                            'Made by N.V.Zuijlen')
         main_menu = MenuScreen('MAIN_MENU', 'Menu', self)
@@ -318,25 +321,26 @@ class ScreenManager:
 
         self.current = home
 
-        self.lcd = CharLCD(i2c_expander='PCF8574', address=0x3F, cols=20, rows=4,
-                           auto_linebreaks=False, backlight_enabled=False)
+        with self.lcd_lock:
+            self.lcd = CharLCD(i2c_expander='PCF8574', address=0x3F, cols=20, rows=4,
+                               auto_linebreaks=False, backlight_enabled=False)
 
-        self.lcd.cursor_mode = 'hide'
+            self.lcd.cursor_mode = 'hide'
 
-        # UP/DOWN arrow. Use as char \x00
-        self.lcd.create_char(0, (
-            0b00100,
-            0b01110,
-            0b11111,
-            0b00000,
-            0b00000,
-            0b11111,
-            0b01110,
-            0b00100
-            ))
+            # UP/DOWN arrow. Use as char \x00
+            self.lcd.create_char(0, (
+                0b00100,
+                0b01110,
+                0b11111,
+                0b00000,
+                0b00000,
+                0b11111,
+                0b01110,
+                0b00100
+                ))
 
-        self.updateScreen()
-        #self.backlightOn()
+            self.updateScreen()
+            #self.backlightOn()
 
     def listenToGPIO(self):
         for pin in [UP_BUTTON, DOWN_BUTTON, OK_BUTTON, BACK_BUTTON]:
@@ -371,7 +375,8 @@ class ScreenManager:
 
     def backlightOn(self):
         self.on_time = datetime.now()
-        self.lcd.backlight_enabled = True
+        with self.lcd_lock:
+            self.lcd.backlight_enabled = True
         self.panel.threadSafeSchedule(
             11*1000,
             self.turn_off_backlight_if_inactivity
@@ -379,19 +384,22 @@ class ScreenManager:
 
     def turn_off_backlight_if_inactivity(self):
         if datetime.now() - self.on_time >= timedelta(seconds=10):
-            self.lcd.backlight_enabled = False
+            with self.lcd_lock:
+                self.lcd.backlight_enabled = False
 
     def updateScreen(self):
         self.current.computeDisplay()
 
-        self.lcd.clear()
-        self.lcd.write_string(self.current.first_line)
-        self.lcd.crlf()
-        self.lcd.write_string(self.current.second_line)
+        with self.lcd_lock:
+            self.lcd.clear()
+            self.lcd.write_string(self.current.first_line)
+            self.lcd.crlf()
+            self.lcd.write_string(self.current.second_line)
 
     def cleanup(self):
         GPIO.cleanup()
-        self.lcd.close(clear=True)
+        with self.lcd_lock:
+            self.lcd.close(clear=True)
 
 
 if __name__ == '__main__':
@@ -405,7 +413,8 @@ if __name__ == '__main__':
 
     try:
         #manager.backlightOn()
-        manager.lcd.backlight_enabled = True
+        with manager.lcd_lock:
+            manager.lcd.backlight_enabled = True
 
         manager.listenToGPIO()
         manager.updateScreen()
